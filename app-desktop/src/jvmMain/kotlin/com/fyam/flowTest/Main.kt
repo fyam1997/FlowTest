@@ -1,5 +1,7 @@
 package com.fyam.flowTest
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
@@ -17,5 +19,6 @@ fun main() {
         state = windowState,
         icon = BitmapPainter(useResource("ic/ic_launcher.png", ::loadImageBitmap)),
     ) {
+        Root(Modifier.fillMaxSize())
     }
 }
