@@ -23,14 +23,15 @@ import kotlin.time.measureTime
 @OptIn(ExperimentalTime::class)
 @Composable
 fun JobButton(
+    modifier: Modifier = Modifier,
     title: String,
     scope: CoroutineScope = rememberCoroutineScope(),
-    onDone: suspend (time: Duration) -> Unit,
+    onDone: suspend (time: Duration) -> Unit = {},
     onClick: suspend CoroutineScope.() -> Unit,
 ) {
     var loading by remember { mutableStateOf(false) }
     Button(
-        modifier = Modifier.padding(horizontal = 4.dp),
+        modifier = modifier,
         content = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(text = title)
