@@ -20,7 +20,7 @@ class LoggerState {
         private set
 
     infix fun log(text: String) {
-        logs = "$text\n$logs"
+        logs = "$logs\n$text"
     }
 
     fun clean() {
