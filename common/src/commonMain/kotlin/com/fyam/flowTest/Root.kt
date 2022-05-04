@@ -15,6 +15,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.fyam.flowTest.components.*
 import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
@@ -124,6 +126,30 @@ private fun Buttons(
                     logger.log("Catch: ${it.message}")
                 }.collect {
                     throw Exception("Error in collect")
+                }
+        }
+    )
+    JobButton(
+        title = "Not Cancellable",
+        logger = logger,
+        onClick = {
+            // asFlow/flowOf will call unsafeFlow, otoh flow{} will call safeFlow
+            (0..20).asFlow()
+                .collect {
+                    logger.log("Received: $it")
+                    currentCoroutineContext().cancel()
+                }
+        }
+    )
+    JobButton(
+        title = "Cancellable",
+        logger = logger,
+        onClick = {
+            (0..20).asFlow()
+                .cancellable()
+                .collect {
+                    logger.log("Received: $it")
+                    currentCoroutineContext().cancel()
                 }
         }
     )
