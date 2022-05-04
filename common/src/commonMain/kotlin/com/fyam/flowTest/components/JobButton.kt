@@ -45,7 +45,7 @@ fun JobButton(
         },
         onClick = {
             scope.launch(
-                context = CoroutineName("Launch scope $title") + Dispatchers.Default,
+                context = CoroutineName("Launch scope [$title]") + Dispatchers.Default,
                 block = {
                     loading = true
                     val time = measureTime {
