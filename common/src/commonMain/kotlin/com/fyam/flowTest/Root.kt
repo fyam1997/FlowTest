@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.fyam.flowTest.components.*
 import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
 @Composable
@@ -45,7 +46,6 @@ fun Root(
         )
     }
 }
-
 
 @Composable
 private fun Buttons(
@@ -96,6 +96,23 @@ private fun Buttons(
                 }.collect {
                     logger.log("collect-$it-${currentCoroutineName()}")
                 }
+        }
+    )
+    JobButton(
+        title = "error",
+        log = logger::log,
+        onClick = {
+            flow<String> {
+                throw Exception("Error")
+            }.retryWhen { cause, attempt ->
+                emit("Retry: ${cause.message}-$attempt")
+                delay(100)
+                attempt < 3
+            }.catch {
+                emit("Catch: ${it.message}")
+            }.collect {
+                logger.log(it)
+            }
         }
     )
 }
