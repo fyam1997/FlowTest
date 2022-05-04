@@ -53,4 +53,31 @@ private fun Buttons(
                 }
         }
     )
+    JobButton(
+        title = "flowOn",
+        onClick = {
+            flowOf(1)
+                // Context A
+                .onEach {
+                    logger.log("onEach-$it-${currentCoroutineName()}")
+                }
+                .onEach {
+                    logger.log("onEach-$it-${currentCoroutineName()}")
+                }
+                .flowOn(CoroutineName("context A"))
+
+                // Context B
+                .onEach {
+                    logger.log("onEach-$it-${currentCoroutineName()}")
+                }
+                .flowOn(CoroutineName("context B"))
+
+                // Launch context
+                .onEach {
+                    logger.log("onEach-$it-${currentCoroutineName()}")
+                }.collect {
+                    logger.log("collect-$it-${currentCoroutineName()}")
+                }
+        }
+    )
 }
