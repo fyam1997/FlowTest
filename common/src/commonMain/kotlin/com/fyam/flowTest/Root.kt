@@ -1,12 +1,14 @@
 package com.fyam.flowTest
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.Typography
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
@@ -20,22 +22,30 @@ fun Root(
     modifier: Modifier = Modifier,
 ) = MaterialTheme(typography = Typography(defaultFontFamily = FontFamily.Monospace)) {
     val logger = rememberLoggerState()
-
-    LazyColumn(modifier.padding(horizontal = 8.dp)) {
-        item {
-            Button(onClick = logger::clean) { Text("Clean Log") }
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                content = {
-                    Buttons(logger)
-                }
-            )
-        }
-        item {
-            Logger(state = logger)
-        }
+    Column(modifier.padding(horizontal = 8.dp)) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            content = {
+                IconButton(
+                    onClick = logger::clean,
+                    content = {
+                        Icon(
+                            imageVector = Icons.Default.CleaningServices,
+                            contentDescription = "Clean Logger",
+                            tint = MaterialTheme.colors.primary,
+                        )
+                    },
+                )
+                Buttons(logger)
+            }
+        )
+        LogBoard(
+            modifier = Modifier.weight(1f),
+            state = logger
+        )
     }
 }
+
 
 @Composable
 private fun Buttons(
