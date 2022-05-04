@@ -3,6 +3,7 @@ package com.fyam.flowTest.components
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import kotlinx.datetime.Clock
 
 @Composable
 fun Logger(
@@ -19,8 +20,8 @@ class LoggerState {
     var logs: String by mutableStateOf("")
         private set
 
-    infix fun log(text: String) {
-        logs = "$logs\n$text"
+    infix fun log(text: Any?) {
+        logs = "$logs\n${Clock.System.now()}: $text"
     }
 
     fun clean() {

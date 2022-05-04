@@ -2,7 +2,6 @@ package com.fyam.flowTest.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
@@ -16,7 +15,7 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.time.Duration
+import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
@@ -25,8 +24,8 @@ import kotlin.time.measureTime
 fun JobButton(
     modifier: Modifier = Modifier,
     title: String,
+    log: (String) -> Unit,
     scope: CoroutineScope = rememberCoroutineScope(),
-    onDone: suspend (time: Duration) -> Unit = {},
     onClick: suspend CoroutineScope.() -> Unit,
 ) {
     var loading by remember { mutableStateOf(false) }
@@ -47,11 +46,15 @@ fun JobButton(
             scope.launch(
                 context = CoroutineName("Launch scope [$title]") + Dispatchers.Default,
                 block = {
+                    log("$title Started ".padEnd(40, '='))
                     loading = true
                     val time = measureTime {
                         onClick()
                     }
-                    onDone(time)
+                    log(
+                        "$title Done, spent ${time.toString(unit = DurationUnit.MILLISECONDS)} "
+                            .padEnd(40, '=')
+                    )
                     loading = false
                 }
             )
