@@ -15,6 +15,7 @@ kotlin {
         getByName("commonMain") {
             dependencies {
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+                api("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
 
                 api(compose.runtime)
                 api(compose.foundation)
