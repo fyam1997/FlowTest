@@ -4,9 +4,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.fyam.flowTest.components.*
 import kotlinx.coroutines.CoroutineName
@@ -15,7 +18,7 @@ import kotlinx.coroutines.flow.*
 @Composable
 fun Root(
     modifier: Modifier = Modifier,
-) {
+) = MaterialTheme(typography = Typography(defaultFontFamily = FontFamily.Monospace)) {
     val logger = rememberLoggerState()
 
     LazyColumn(modifier.padding(horizontal = 8.dp)) {
