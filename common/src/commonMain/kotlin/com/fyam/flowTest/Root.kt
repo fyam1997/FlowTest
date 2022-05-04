@@ -115,4 +115,16 @@ private fun Buttons(
             }
         }
     )
+    JobButton(
+        title = "error outside",
+        log = logger::log,
+        onClick = {
+            flowOf(1)
+                .catch {
+                    logger.log("Catch: ${it.message}")
+                }.collect {
+                    throw Exception("Error in collect")
+                }
+        }
+    )
 }

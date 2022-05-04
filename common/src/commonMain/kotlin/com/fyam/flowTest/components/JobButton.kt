@@ -46,10 +46,14 @@ fun JobButton(
             scope.launch(
                 context = CoroutineName("Launch scope [$title]") + Dispatchers.Default,
                 block = {
-                    log("$title Started ".padEnd(40, '='))
+                    log("\n$title Started ".padEnd(40, '='))
                     loading = true
                     val time = measureTime {
-                        onClick()
+                        try {
+                            onClick()
+                        }catch (e: Exception){
+                            log("Unexpected exception: ${e.message}")
+                        }
                     }
                     log(
                         "$title Done, spent ${time.toString(unit = DurationUnit.MILLISECONDS)} "
