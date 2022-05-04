@@ -53,7 +53,7 @@ private fun Buttons(
 ) {
     JobButton(
         title = "Flow life cycle",
-        log = logger::log,
+        logger = logger,
         onClick = {
             flowOf(1, 2, 3, 4)
                 .onCompletion {
@@ -72,7 +72,7 @@ private fun Buttons(
     )
     JobButton(
         title = "flowOn",
-        log = logger::log,
+        logger = logger,
         onClick = {
             flowOf(1)
                 // Context A
@@ -100,7 +100,7 @@ private fun Buttons(
     )
     JobButton(
         title = "error",
-        log = logger::log,
+        logger = logger,
         onClick = {
             flow<String> {
                 throw Exception("Error")
@@ -117,7 +117,7 @@ private fun Buttons(
     )
     JobButton(
         title = "error outside",
-        log = logger::log,
+        logger = logger,
         onClick = {
             flowOf(1)
                 .catch {

@@ -24,7 +24,7 @@ import kotlin.time.measureTime
 fun JobButton(
     modifier: Modifier = Modifier,
     title: String,
-    log: (String) -> Unit,
+    logger: LoggerState,
     scope: CoroutineScope = rememberCoroutineScope(),
     onClick: suspend CoroutineScope.() -> Unit,
 ) {
@@ -46,16 +46,17 @@ fun JobButton(
             scope.launch(
                 context = CoroutineName("Launch scope [$title]") + Dispatchers.Default,
                 block = {
-                    log("\n$title Started ".padEnd(40, '='))
+                    logger.newLine()
+                    logger.log("$title Started ".padEnd(40, '='))
                     loading = true
                     val time = measureTime {
                         try {
                             onClick()
-                        }catch (e: Exception){
-                            log("Unexpected exception: ${e.message}")
+                        } catch (e: Exception) {
+                            logger.log("Unexpected exception: $e")
                         }
                     }
-                    log(
+                    logger.log(
                         "$title Done, spent ${time.toString(unit = DurationUnit.MILLISECONDS)} "
                             .padEnd(40, '=')
                     )

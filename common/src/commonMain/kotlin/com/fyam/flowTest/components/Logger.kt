@@ -29,7 +29,11 @@ class LoggerState {
         private set
 
     infix fun log(text: Any?) {
-        logs = "$logs\n${Clock.System.now()}: $text"
+        logs += "\n${Clock.System.now()}: $text"
+    }
+
+    fun newLine() {
+        logs += "\n"
     }
 
     fun clean() {
