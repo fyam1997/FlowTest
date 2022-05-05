@@ -11,7 +11,7 @@ import androidx.compose.ui.window.singleWindowApplication
 
 fun main() {
     val windowState = WindowState(
-        width = 600.dp,
+        width = 800.dp,
         height = 600.dp
     )
     singleWindowApplication(
