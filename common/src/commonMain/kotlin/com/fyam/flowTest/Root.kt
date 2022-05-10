@@ -79,6 +79,19 @@ private fun Buttons(
         }
     )
     JobButton(
+        title = "OnEmpty",
+        logger = logger,
+        onClick = {
+            flowOf<String>()
+                .onEmpty {
+                    emit("empty")
+                }
+                .collect {
+                    logger.log("collect-$it")
+                }
+        }
+    )
+    JobButton(
         title = "flowOn",
         logger = logger,
         onClick = {
