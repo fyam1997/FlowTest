@@ -61,11 +61,14 @@ private fun Buttons(
                 .onCompletion {
                     emit("onCompletion-A")
                 }
-                .onEach {
-                    logger.log("onEach-$it")
+                .onStart {
+                    emit("onStart-A")
                 }
                 .onStart {
-                    logger.log("onStart")
+                    emit("onStart-B")
+                }
+                .onEach {
+                    logger.log("onEach-$it")
                 }
                 .onCompletion {
                     emit("onCompletion-B")
