@@ -14,15 +14,16 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.fyam.flowTest.components.FlowRow
 import com.fyam.flowTest.components.LogBoard
+import com.fyam.flowTest.components.LoggerState
 import com.fyam.flowTest.components.rememberLoggerState
 
 @Composable
 fun Root(
     modifier: Modifier = Modifier,
+    logger: LoggerState = rememberLoggerState(),
 ) = MaterialTheme(
     typography = MaterialTheme.typography.copy(defaultFontFamily = FontFamily.Monospace)
 ) {
-    val logger = rememberLoggerState()
     Column(modifier.padding(horizontal = 8.dp)) {
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
