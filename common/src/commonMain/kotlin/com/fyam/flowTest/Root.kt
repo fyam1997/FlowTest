@@ -110,6 +110,9 @@ private fun Buttons(
                 emit("Retry: ${cause.message}-$attempt")
                 delay(100)
                 attempt < 3
+            }.onCompletion {
+                emit("emit onComplete: ${it?.message}")
+                logger.log("onComplete: ${it?.message}")
             }.catch {
                 emit("Catch: ${it.message}")
             }.collect {
@@ -121,9 +124,12 @@ private fun Buttons(
         title = "error outside",
         logger = logger,
         onClick = {
-            flowOf(1)
+            flowOf("1")
                 .catch {
                     logger.log("Catch: ${it.message}")
+                }.onCompletion {
+                    emit("emit onComplete: ${it?.message}")
+                    logger.log("onComplete: ${it?.message}")
                 }.collect {
                     throw Exception("Error in collect")
                 }
