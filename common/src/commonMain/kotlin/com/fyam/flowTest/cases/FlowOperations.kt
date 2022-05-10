@@ -1,9 +1,9 @@
-package com.fyam.flowTest
+package com.fyam.flowTest.cases
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import com.fyam.flowTest.components.JobButton
 import com.fyam.flowTest.components.LoggerState
+import com.fyam.flowTest.currentCoroutineName
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.currentCoroutineContext
@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.*
 
 @Composable
 fun FlowOperations(
-    modifier: Modifier = Modifier,
     logger: LoggerState,
 ) {
     JobButton(
