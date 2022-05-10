@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Typography
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.runtime.Composable
@@ -20,7 +19,9 @@ import com.fyam.flowTest.components.rememberLoggerState
 @Composable
 fun Root(
     modifier: Modifier = Modifier,
-) = MaterialTheme(typography = Typography(defaultFontFamily = FontFamily.Monospace)) {
+) = MaterialTheme(
+    typography = MaterialTheme.typography.copy(defaultFontFamily = FontFamily.Monospace)
+) {
     val logger = rememberLoggerState()
     Column(modifier.padding(horizontal = 8.dp)) {
         FlowRow(
