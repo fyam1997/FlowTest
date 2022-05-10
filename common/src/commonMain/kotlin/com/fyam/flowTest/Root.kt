@@ -57,15 +57,18 @@ private fun Buttons(
         title = "Flow life cycle",
         logger = logger,
         onClick = {
-            flowOf(1, 2, 3, 4)
+            flowOf("1", "2", "3", "4")
                 .onCompletion {
-                    logger.log("onCompletion")
+                    emit("onCompletion-A")
                 }
                 .onEach {
                     logger.log("onEach-$it")
                 }
                 .onStart {
                     logger.log("onStart")
+                }
+                .onCompletion {
+                    emit("onCompletion-B")
                 }
                 .collect {
                     logger.log("collect-$it")
@@ -111,7 +114,6 @@ private fun Buttons(
                 delay(100)
                 attempt < 3
             }.onCompletion {
-                emit("emit onComplete: ${it?.message}")
                 logger.log("onComplete: ${it?.message}")
             }.catch {
                 emit("Catch: ${it.message}")
@@ -122,6 +124,20 @@ private fun Buttons(
     )
     JobButton(
         title = "error outside",
+        logger = logger,
+        onClick = {
+            flowOf("1")
+                .catch {
+                    logger.log("Catch: ${it.message}")
+                }.onCompletion {
+                    logger.log("onComplete: ${it?.message}")
+                }.collect {
+                    throw Exception("Error in collect")
+                }
+        }
+    )
+    JobButton(
+        title = "emit when complete",
         logger = logger,
         onClick = {
             flowOf("1")
