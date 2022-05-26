@@ -15,7 +15,7 @@ fun CallbackFlows(
         logger = logger,
         onClick = {
             callbackFlow {
-                CallbackFlows.oldAssCall {
+                oldAssCall {
                     trySend(it)
                     close()
                 }
@@ -29,6 +29,4 @@ fun CallbackFlows(
     )
 }
 
-object CallbackFlows {
-    lateinit var oldAssCall: ((String) -> Unit) -> Unit
-}
+expect fun oldAssCall(onResult: (String) -> Unit)
