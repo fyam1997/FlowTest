@@ -29,4 +29,5 @@ fun CallbackFlows(
     )
 }
 
+@Suppress("NO_ACTUAL_FOR_EXPECT") // IDE bug
 expect fun oldAssCall(onResult: (String) -> Unit)
