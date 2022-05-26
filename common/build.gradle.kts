@@ -12,7 +12,7 @@ kotlin {
     android()
     jvm("desktop")
     sourceSets {
-        val commonMain = getByName("commonMain") {
+        getByName("commonMain") {
             dependencies {
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
@@ -22,16 +22,6 @@ kotlin {
                 api(compose.material)
                 api(compose.materialIconsExtended)
             }
-        }
-        // TODO should specify target for sourceSet
-        val jvmMain = create("jvmMain") {
-            dependsOn(commonMain)
-        }
-        getByName("desktopMain") {
-            dependsOn(jvmMain)
-        }
-        getByName("androidMain") {
-            dependsOn(jvmMain)
         }
         getByName("commonTest") {
             dependencies {
