@@ -12,7 +12,7 @@ kotlin {
     android()
     jvm("desktop")
     sourceSets {
-        getByName("commonMain") {
+        named("commonMain") {
             dependencies {
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
@@ -23,7 +23,7 @@ kotlin {
                 api(compose.materialIconsExtended)
             }
         }
-        getByName("commonTest") {
+        named("commonTest") {
             dependencies {
                 implementation(kotlin("test"))
             }
