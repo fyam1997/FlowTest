@@ -23,6 +23,7 @@ kotlin {
                 api(compose.materialIconsExtended)
             }
         }
+        // TODO should specify target for sourceSet
         val jvmMain = create("jvmMain") {
             dependsOn(commonMain)
         }
