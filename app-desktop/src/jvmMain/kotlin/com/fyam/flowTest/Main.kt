@@ -43,7 +43,7 @@ fun main() = application(exitProcessOnExit = true) {
             }
         },
         content = {
-            Root(modifier = Modifier.fillMaxSize(), logger = logger)
+            Root(logger = logger)
         }
     )
 }

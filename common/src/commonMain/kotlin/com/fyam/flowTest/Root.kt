@@ -2,6 +2,7 @@ package com.fyam.flowTest
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -21,7 +22,7 @@ import com.fyam.flowTest.components.rememberLoggerState
 
 @Composable
 fun Root(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.fillMaxSize(),
     logger: LoggerState = rememberLoggerState(),
 ) = MaterialTheme(
     typography = MaterialTheme.typography.copy(defaultFontFamily = FontFamily.Monospace)
