@@ -15,11 +15,15 @@ fun CallbackFlows(
         logger = logger,
         onClick = {
             callbackFlow {
-                oldAssCall {
-                    trySend(it)
-                    close()
-                }
+                val oldAss = OldAss()
+                oldAss.retrieveSomething(
+                    onResult = { result ->
+                        trySend(result)
+                        close()
+                    }
+                )
                 awaitClose {
+                    oldAss.unregister()
                     logger.log("close")
                 }
             }.collect {
@@ -30,4 +34,7 @@ fun CallbackFlows(
 }
 
 @Suppress("NO_ACTUAL_FOR_EXPECT") // IDE bug
-expect fun oldAssCall(onResult: (String) -> Unit)
+expect class OldAss() {
+    fun unregister()
+    fun retrieveSomething(onResult: (String) -> Unit)
+}
