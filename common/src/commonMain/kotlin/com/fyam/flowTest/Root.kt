@@ -1,9 +1,6 @@
 package com.fyam.flowTest
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -16,10 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.fyam.flowTest.cases.CallbackFlows
 import com.fyam.flowTest.cases.ChannelFlows
 import com.fyam.flowTest.cases.FlowOperations
-import com.fyam.flowTest.components.FlowRow
-import com.fyam.flowTest.components.LogBoard
-import com.fyam.flowTest.components.LoggerState
-import com.fyam.flowTest.components.rememberLoggerState
+import com.fyam.flowTest.components.*
 
 @Composable
 fun Root(
@@ -46,6 +40,10 @@ fun Root(
                 CallbackFlows(logger = logger)
                 ChannelFlows(logger = logger)
             }
+        )
+        TimeLine(
+            modifier = Modifier.fillMaxWidth().height(32.dp),
+            state = logger
         )
         LogBoard(
             modifier = Modifier.weight(1f),
