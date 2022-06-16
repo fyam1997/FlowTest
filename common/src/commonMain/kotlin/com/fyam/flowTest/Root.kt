@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.fyam.flowTest.cases.CallbackFlows
+import com.fyam.flowTest.cases.ChannelFlows
 import com.fyam.flowTest.cases.FlowOperations
 import com.fyam.flowTest.components.FlowRow
 import com.fyam.flowTest.components.LogBoard
@@ -43,6 +44,7 @@ fun Root(
                 )
                 FlowOperations(logger = logger)
                 CallbackFlows(logger = logger)
+                ChannelFlows(logger = logger)
             }
         )
         LogBoard(
