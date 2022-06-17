@@ -38,17 +38,11 @@ fun LogBoard(
         items(state.logs) { log ->
             LogItem(
                 log = log,
-                focused = log in state.focusing,
-                hovered = log in state.hovering,
                 onClick = {
-                    if (log in state.focusing)
-                        state.focusing -= log
-                    else state.focusing += log
+                    state.focus(log)
                 },
-                onHoverChanged = { hovered ->
-                    if (hovered)
-                        state.hovering += log
-                    else state.hovering -= log
+                onHoverChanged = {
+                    state.hover(log)
                 },
             )
         }
@@ -59,8 +53,6 @@ fun LogBoard(
 private fun LazyItemScope.LogItem(
     modifier: Modifier = Modifier,
     log: Log,
-    focused: Boolean,
-    hovered: Boolean,
     onClick: () -> Unit,
     onHoverChanged: (hovered: Boolean) -> Unit,
 ) {
@@ -74,8 +66,8 @@ private fun LazyItemScope.LogItem(
         }
     }
 
-    val color = if (focused) MaterialTheme.colors.onPrimary else Color.Unspecified
-    val background = if (focused)
+    val color = if (log.focusing) MaterialTheme.colors.onPrimary else Color.Unspecified
+    val background = if (log.focusing)
         MaterialTheme.colors.primary.copy(ContentAlpha.medium)
     else Color.Unspecified
     Row(
@@ -85,7 +77,7 @@ private fun LazyItemScope.LogItem(
             .clickable(onClick = onClick)
             .run {
                 when {
-                    hovered -> border(
+                    log.hovering -> border(
                         ButtonDefaults.outlinedBorder.copy(width = 4.dp),
                         MaterialTheme.shapes.medium
                     )
@@ -104,12 +96,11 @@ private fun LazyItemScope.LogItem(
 @Composable
 fun TimeLine(
     modifier: Modifier = Modifier,
-    state: LoggerState,
+    logs: List<Log>
 ) {
-    if (state.logs.isEmpty()) return
-    val normalColor = MaterialTheme.colors.primary
-    val hoverColor = MaterialTheme.colors.secondary
-    val stroke = LocalDensity.current.run {
+    if (logs.isEmpty()) return
+    val color = MaterialTheme.colors.primary
+    val strokeWidth = LocalDensity.current.run {
         1.dp.toPx()
     }
     Canvas(
@@ -121,36 +112,38 @@ fun TimeLine(
             .clipToBounds()
     ) {
         val y = size.height / 2
-        val indicatorRadius = size.height / 2 - stroke * 2
+        val indicatorRadius = size.height / 2 - strokeWidth * 2
         val dotRadius = size.height / 3
         val indicatorSize = size.height
         val drawRange = size.width - indicatorSize
 
-        val start = state.logs.first().time.toEpochMilliseconds()
-        val end = state.logs.last().time.toEpochMilliseconds()
+        val start = logs.first().time.toEpochMilliseconds()
+        val end = logs.last().time.toEpochMilliseconds()
         val scale = drawRange / (end - start)
 
-        fun drawLog(log: Log, highlight: Boolean, color: Color) {
+        logs.forEach { log ->
             val x = (log.time.toEpochMilliseconds() - start) * scale + indicatorSize / 2
             drawCircle(
                 color = color,
                 radius = dotRadius,
                 center = Offset(x, y)
             )
-            if (highlight) {
+            if (log.focusing) {
                 drawCircle(
                     color = color,
                     radius = indicatorRadius,
-                    style = Stroke(stroke),
+                    style = Stroke(strokeWidth),
                     center = Offset(x, y)
                 )
             }
-        }
-        state.logs.forEach { log ->
-            drawLog(log = log, highlight = log in state.focusing, color = normalColor)
-        }
-        state.hovering.forEach { log ->
-            drawLog(log = log, highlight = true, color = hoverColor)
+            if (log.hovering) {
+                drawCircle(
+                    color = color,
+                    radius = indicatorRadius,
+                    style = Stroke(strokeWidth),
+                    center = Offset(x, y)
+                )
+            }
         }
     }
 }
@@ -163,11 +156,17 @@ fun rememberLoggerState() = remember {
 class LoggerState {
     private val _logs = mutableStateListOf<Log>()
     val logs: List<Log> get() = _logs
-    var focusing = mutableStateListOf<Log>()
-    var hovering = mutableStateListOf<Log>()
 
-    infix fun log(text: Any?) {
-        _logs += Log(Clock.System.now(), text.toString())
+    fun log(text: Any?, tag: String = "default") {
+        _logs += Log(tag, Clock.System.now(), text.toString())
+    }
+
+    fun hover(log: Log) {
+        _logs[logIndex(log)] = log.copy(hovering = !log.hovering)
+    }
+
+    fun focus(log: Log) {
+        _logs[logIndex(log)] = log.copy(focusing = !log.focusing)
     }
 
     fun newLine() {
@@ -176,12 +175,15 @@ class LoggerState {
 
     fun clean() {
         _logs.clear()
-        focusing.clear()
-        hovering.clear()
     }
+
+    private fun logIndex(log: Log) = _logs.indexOfFirst { it.time == log.time }
 }
 
 data class Log(
+    val tag: String,
     val time: Instant,
-    val text: String
+    val text: String,
+    val focusing: Boolean = false,
+    val hovering: Boolean = false,
 )

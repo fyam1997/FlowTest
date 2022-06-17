@@ -43,7 +43,7 @@ fun Root(
         )
         TimeLine(
             modifier = Modifier.fillMaxWidth().height(32.dp),
-            state = logger
+            logs = logger.logs
         )
         LogBoard(
             modifier = Modifier.weight(1f),
