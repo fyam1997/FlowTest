@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -37,17 +38,17 @@ fun LogBoard(
         items(state.logs) { log ->
             LogItem(
                 log = log,
-                focused = state.isFocus(log),
+                focused = log in state.focusing,
+                hovered = log in state.hovering,
                 onClick = {
                     if (log in state.focusing)
                         state.focusing -= log
                     else state.focusing += log
                 },
-                onHoverEnter = {
-                    state.hovering += log
-                },
-                onHoverExit = {
-                    state.hovering -= log
+                onHoverChanged = { hovered ->
+                    if (hovered)
+                        state.hovering += log
+                    else state.hovering -= log
                 },
             )
         }
@@ -59,27 +60,38 @@ private fun LazyItemScope.LogItem(
     modifier: Modifier = Modifier,
     log: Log,
     focused: Boolean,
+    hovered: Boolean,
     onClick: () -> Unit,
-    onHoverEnter: () -> Unit,
-    onHoverExit: () -> Unit,
+    onHoverChanged: (hovered: Boolean) -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     LaunchedEffect(interactionSource) {
         interactionSource.interactions.collect { interaction ->
             when (interaction) {
-                is HoverInteraction.Enter -> onHoverEnter()
-                is HoverInteraction.Exit -> onHoverExit()
+                is HoverInteraction.Enter -> onHoverChanged(true)
+                is HoverInteraction.Exit -> onHoverChanged(false)
             }
         }
     }
 
     val color = if (focused) MaterialTheme.colors.onPrimary else Color.Unspecified
-    val background = if (focused) MaterialTheme.colors.primary else Color.Unspecified
+    val background = if (focused)
+        MaterialTheme.colors.primary.copy(ContentAlpha.medium)
+    else Color.Unspecified
     Row(
         modifier = modifier
             .fillParentMaxWidth()
             .hoverable(interactionSource)
             .clickable(onClick = onClick)
+            .run {
+                when {
+                    hovered -> border(
+                        ButtonDefaults.outlinedBorder.copy(width = 4.dp),
+                        MaterialTheme.shapes.medium
+                    )
+                    else -> this
+                }
+            }
             .clip(MaterialTheme.shapes.medium)
             .background(background)
             .padding(4.dp)
@@ -135,7 +147,7 @@ fun TimeLine(
             }
         }
         state.logs.forEach { log ->
-            drawLog(log = log, highlight = state.isFocus(log), color = normalColor)
+            drawLog(log = log, highlight = log in state.focusing, color = normalColor)
         }
         state.hovering.forEach { log ->
             drawLog(log = log, highlight = true, color = hoverColor)
@@ -167,8 +179,6 @@ class LoggerState {
         focusing.clear()
         hovering.clear()
     }
-
-    fun isFocus(log: Log) = log in hovering + focusing
 }
 
 data class Log(
