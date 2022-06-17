@@ -1,8 +1,8 @@
 package com.fyam.flowTest.components
 
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +15,7 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -57,14 +57,8 @@ private fun LazyItemScope.LogItem(
     onHoverChanged: (hovered: Boolean) -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    LaunchedEffect(interactionSource) {
-        interactionSource.interactions.collect { interaction ->
-            when (interaction) {
-                is HoverInteraction.Enter -> onHoverChanged(true)
-                is HoverInteraction.Exit -> onHoverChanged(false)
-            }
-        }
-    }
+    val hovered by interactionSource.collectIsHoveredAsState()
+    if (hovered != log.hovering) onHoverChanged(hovered)
 
     val color = if (log.focusing) MaterialTheme.colors.onPrimary else Color.Unspecified
     val background = if (log.focusing)
