@@ -23,7 +23,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Clock
@@ -60,24 +59,20 @@ private fun LazyItemScope.LogItem(
     val hovered by interactionSource.collectIsHoveredAsState()
     if (hovered != log.hovering) onHoverChanged(hovered)
 
-    val color = if (log.focusing) MaterialTheme.colors.onPrimary else Color.Unspecified
-    val background = if (log.focusing)
-        MaterialTheme.colors.primary.copy(ContentAlpha.medium)
-    else Color.Unspecified
+    val color = when {
+        log.focusing || log.hovering -> MaterialTheme.colors.onPrimary
+        else -> Color.Unspecified
+    }
+    val background = when {
+        log.hovering -> MaterialTheme.colors.primary
+        log.focusing -> MaterialTheme.colors.primary.copy(ContentAlpha.high)
+        else -> Color.Unspecified
+    }
     Row(
         modifier = modifier
             .fillParentMaxWidth()
             .hoverable(interactionSource)
             .clickable(onClick = onClick)
-            .run {
-                when {
-                    log.hovering -> border(
-                        ButtonDefaults.outlinedBorder.copy(width = 4.dp),
-                        MaterialTheme.shapes.medium
-                    )
-                    else -> this
-                }
-            }
             .clip(MaterialTheme.shapes.medium)
             .background(background)
             .padding(4.dp)
@@ -105,37 +100,36 @@ fun TimeLine(
             .padding(4.dp)
             .clipToBounds()
     ) {
-        val y = size.height / 2
-        val indicatorRadius = size.height / 2 - strokeWidth * 2
-        val dotRadius = size.height / 3
-        val indicatorSize = size.height
-        val drawRange = size.width - indicatorSize
+        val start = logs.first().timeMs
+        val end = logs.last().timeMs
 
-        val start = logs.first().time.toEpochMilliseconds()
-        val end = logs.last().time.toEpochMilliseconds()
-        val scale = drawRange / (end - start)
+        val dotRadius = size.height / 4
+        val indicatorRadius = dotRadius / 2
+        val scale = (size.width - dotRadius * 2) / (end - start)
+
+        val axisDot = size.height / 2
+        val axisFocus = size.height / 8
+        val axisHover = size.height * 7 / 8
 
         logs.forEach { log ->
-            val x = (log.time.toEpochMilliseconds() - start) * scale + indicatorSize / 2
+            val x = (log.timeMs - start) * scale + dotRadius
             drawCircle(
                 color = color,
                 radius = dotRadius,
-                center = Offset(x, y)
+                center = Offset(x, axisDot)
             )
             if (log.focusing) {
                 drawCircle(
                     color = color,
                     radius = indicatorRadius,
-                    style = Stroke(strokeWidth),
-                    center = Offset(x, y)
+                    center = Offset(x, axisFocus)
                 )
             }
             if (log.hovering) {
                 drawCircle(
                     color = color,
                     radius = indicatorRadius,
-                    style = Stroke(strokeWidth),
-                    center = Offset(x, y)
+                    center = Offset(x, axisHover)
                 )
             }
         }
@@ -180,4 +174,6 @@ data class Log(
     val text: String,
     val focusing: Boolean = false,
     val hovering: Boolean = false,
-)
+) {
+    val timeMs get() = time.toEpochMilliseconds()
+}
