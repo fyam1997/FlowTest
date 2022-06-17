@@ -30,6 +30,7 @@ fun FlowOperations(
                 }
                 .onEach {
                     logger.log("onEach-$it")
+                    delay(50)
                 }
                 .onCompletion {
                     emit("onCompletion-B")
@@ -75,6 +76,7 @@ fun FlowOperations(
                 // Launch context
                 .onEach {
                     logger.log("onEach-$it-${currentCoroutineName()}")
+                    delay(50)
                 }.collect {
                     logger.log("collect-$it-${currentCoroutineName()}")
                 }
@@ -134,6 +136,7 @@ fun FlowOperations(
         onClick = {
             // asFlow/flowOf will call unsafeFlow, otoh flow{} will call safeFlow
             (0..20).asFlow()
+                .onEach { delay(50) }
                 .collect {
                     logger.log("Received: $it")
                     currentCoroutineContext().cancel()
@@ -145,6 +148,7 @@ fun FlowOperations(
         logger = logger,
         onClick = {
             (0..20).asFlow()
+                .onEach { delay(50) }
                 .cancellable()
                 .collect {
                     logger.log("Received: $it")
