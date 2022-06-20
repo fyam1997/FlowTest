@@ -3,10 +3,7 @@ package com.fyam.flowTest.components
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
@@ -18,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
@@ -85,49 +83,69 @@ private fun LazyItemScope.LogItem(
 fun TimeLine(
     modifier: Modifier = Modifier,
     logs: List<Log>
+) = Column(modifier) {
+    if (logs.isEmpty()) return@Column
+    val start = logs.first().timeMs
+    val end = logs.last().timeMs
+    logs.groupBy(Log::tag).forEach { (tag, logsOfTag) ->
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (logsOfTag.isEmpty()) return@Row
+            Text("$tag: ")
+            TimeLine(
+                modifier = Modifier.height(32.dp),
+                logs = logsOfTag,
+                start = start,
+                end = end,
+                color = MaterialTheme.colors.primary,
+            )
+        }
+    }
+}
+
+@Composable
+fun TimeLine(
+    modifier: Modifier = Modifier,
+    logs: List<Log>,
+    start: Long,
+    end: Long,
+    color: Color,
+) = Canvas(
+    modifier
+        .fillMaxSize()
+        .border(ButtonDefaults.outlinedBorder, MaterialTheme.shapes.medium)
+        .clip(MaterialTheme.shapes.medium)
+        .padding(4.dp)
+        .clipToBounds()
 ) {
-    if (logs.isEmpty()) return
-    val color = MaterialTheme.colors.primary
-    Canvas(
-        modifier
-            .fillMaxSize()
-            .border(ButtonDefaults.outlinedBorder, MaterialTheme.shapes.medium)
-            .clip(MaterialTheme.shapes.medium)
-            .padding(4.dp)
-            .clipToBounds()
-    ) {
-        val start = logs.first().timeMs
-        val end = logs.last().timeMs
+    val timeInterval = end - start
+    val dotRadius = size.height / 4
+    val indicatorRadius = dotRadius / 2
+    val scale = (size.width - dotRadius * 2) / (timeInterval)
 
-        val dotRadius = size.height / 4
-        val indicatorRadius = dotRadius / 2
-        val scale = (size.width - dotRadius * 2) / (end - start)
+    val axisDot = size.height / 2
+    val axisFocus = size.height / 8
+    val axisHover = size.height * 7 / 8
 
-        val axisDot = size.height / 2
-        val axisFocus = size.height / 8
-        val axisHover = size.height * 7 / 8
-
-        logs.forEach { log ->
-            val x = (log.timeMs - start) * scale + dotRadius
+    logs.forEach { log ->
+        val x = (log.timeMs - start) * scale + dotRadius
+        drawCircle(
+            color = color,
+            radius = dotRadius,
+            center = Offset(x, axisDot)
+        )
+        if (log.focusing) {
             drawCircle(
                 color = color,
-                radius = dotRadius,
-                center = Offset(x, axisDot)
+                radius = indicatorRadius,
+                center = Offset(x, axisFocus)
             )
-            if (log.focusing) {
-                drawCircle(
-                    color = color,
-                    radius = indicatorRadius,
-                    center = Offset(x, axisFocus)
-                )
-            }
-            if (log.hovering) {
-                drawCircle(
-                    color = color,
-                    radius = indicatorRadius,
-                    center = Offset(x, axisHover)
-                )
-            }
+        }
+        if (log.hovering) {
+            drawCircle(
+                color = color,
+                radius = indicatorRadius,
+                center = Offset(x, axisHover)
+            )
         }
     }
 }
