@@ -23,7 +23,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -89,9 +88,6 @@ fun TimeLine(
 ) {
     if (logs.isEmpty()) return
     val color = MaterialTheme.colors.primary
-    val strokeWidth = LocalDensity.current.run {
-        1.dp.toPx()
-    }
     Canvas(
         modifier
             .fillMaxSize()
