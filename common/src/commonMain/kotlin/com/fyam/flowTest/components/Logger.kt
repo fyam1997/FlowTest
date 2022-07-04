@@ -4,15 +4,12 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
@@ -77,25 +74,33 @@ private fun LazyItemScope.LogItem(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TimeLine(
     modifier: Modifier = Modifier,
     state: LoggerState,
-) = Column(modifier) {
-    if (state.logs.isEmpty()) return@Column
+) {
+    if (state.logs.isEmpty()) return
     val start = state.logs.first().value.timeMs
     val end = state.logs.last().value.timeMs
-    state.logsMap.forEach { (tag, logsOfTag) ->
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            if (logsOfTag.isEmpty()) return@Row
-            Text("$tag: ")
-            TimeLine(
-                modifier = Modifier.height(32.dp),
-                logs = logsOfTag,
-                start = start,
-                end = end,
-                color = MaterialTheme.colors.primary,
-            )
+    LazyVerticalGrid(
+        // TODO better calculate largest tag
+        cells = GridCells.Fixed(5),
+        modifier = modifier
+    ) {
+        state.logsMap.forEach { (tag, logsOfTag) ->
+            item({ GridItemSpan(1) }) {
+                Text(tag)
+            }
+            item({ GridItemSpan(4) }) {
+                TimeLine(
+                    modifier = Modifier.height(32.dp),
+                    logs = logsOfTag,
+                    start = start,
+                    end = end,
+                    color = MaterialTheme.colors.primary,
+                )
+            }
         }
     }
 }
@@ -185,6 +190,13 @@ class LoggerState {
     }
 
     private fun findLogState(log: Log) = _logs.find { it.value.time == log.time }
+
+    override fun toString(): String {
+        val mapString = logsMap.entries.joinToString("\n") { (tag, logsOfTag) ->
+            "$tag : ${logsOfTag.joinToString(", ") { it.value.toString() }}"
+        }
+        return "${super.toString()}\n$mapString"
+    }
 }
 
 data class Log(
