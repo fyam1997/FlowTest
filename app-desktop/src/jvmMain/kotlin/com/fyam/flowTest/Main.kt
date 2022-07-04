@@ -1,9 +1,6 @@
 package com.fyam.flowTest
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.isMetaPressed
@@ -14,14 +11,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
-import com.fyam.flowTest.cases.CallbackFlows
 import com.fyam.flowTest.components.rememberLoggerState
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = application(exitProcessOnExit = true) {
     val windowState = WindowState(
         width = 800.dp,
-        height = 600.dp
+        height = 1200.dp
     )
     val logger = rememberLoggerState()
     Window(
