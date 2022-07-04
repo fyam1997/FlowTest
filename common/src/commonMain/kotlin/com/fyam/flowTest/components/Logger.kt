@@ -187,6 +187,7 @@ class LoggerState {
 
     fun clean() {
         _logs.clear()
+        _logsMap.clear()
     }
 
     private fun findLogState(log: Log) = _logs.find { it.value.time == log.time }
