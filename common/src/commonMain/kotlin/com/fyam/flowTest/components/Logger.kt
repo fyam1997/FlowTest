@@ -15,6 +15,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -25,11 +27,27 @@ import kotlinx.datetime.toLocalDateTime
 fun LogBoard(
     modifier: Modifier = Modifier,
     state: LoggerState,
-) {
-    LazyColumn(modifier = modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+) = BoxWithConstraints(modifier) {
+    var largestCellWidth by remember { mutableStateOf(0) }
+    LazyColumn(
+        modifier = Modifier.horizontalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
         items(state.logs) { logState ->
             val log by logState
             LogItem(
+                modifier = Modifier
+                    .layout { measurable, constraints ->
+                        val cellWidth = measurable.measure(constraints).width
+                        if (cellWidth > largestCellWidth) largestCellWidth = cellWidth
+                        val cellMinWidth = maxOf(maxWidth.roundToPx(), largestCellWidth)
+                        val placeable = measurable.measure(
+                            constraints.copy(minWidth = cellMinWidth)
+                        )
+                        layout(cellMinWidth, placeable.height) {
+                            placeable.placeRelative(0, 0)
+                        }
+                    },
                 log = log,
                 onClick = {
                     state.focus(log)
@@ -43,7 +61,7 @@ fun LogBoard(
 }
 
 @Composable
-private fun LazyItemScope.LogItem(
+private fun LogItem(
     modifier: Modifier = Modifier,
     log: Log,
     onClick: () -> Unit,
@@ -64,7 +82,6 @@ private fun LazyItemScope.LogItem(
     }
     Row(
         modifier = modifier
-            .fillParentMaxWidth()
             .hoverable(interactionSource)
             .clickable(onClick = onClick)
             .clip(MaterialTheme.shapes.medium)
@@ -92,7 +109,7 @@ fun TimeLine(
     ) {
         state.logsMap.forEach { (tag, logsOfTag) ->
             item({ GridItemSpan(1) }) {
-                Text(tag)
+                Text(tag, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             item({ GridItemSpan(4) }) {
                 TimeLine(
