@@ -18,6 +18,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun LogBoard(
@@ -69,7 +71,7 @@ private fun LazyItemScope.LogItem(
             .background(background)
             .padding(4.dp)
     ) {
-        Text(color = color, text = "${log.time}: ")
+        Text(color = color, text = "${log.timeText}: ")
         Text(color = color, text = log.text)
     }
 }
@@ -207,5 +209,11 @@ data class Log(
     val focusing: Boolean = false,
     val hovering: Boolean = false,
 ) {
-    val timeMs get() = time.toEpochMilliseconds()
+    val timeMs = time.toEpochMilliseconds()
+    val timeText = with(time.toLocalDateTime(TimeZone.currentSystemDefault())) {
+        listOf(hour, minute, second)
+            .map { "$it".padStart(2, '0') }
+            .plus("${nanosecond / 1_000_000}".padStart(3, '0'))
+            .joinToString(":")
+    }
 }
