@@ -11,10 +11,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,7 +28,8 @@ fun LogBoard(
     state: LoggerState,
 ) {
     LazyColumn(modifier = modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        items(state.logs) { log ->
+        items(state.logs) { logState ->
+            val log by logState
             LogItem(
                 log = log,
                 onClick = {
@@ -82,12 +80,12 @@ private fun LazyItemScope.LogItem(
 @Composable
 fun TimeLine(
     modifier: Modifier = Modifier,
-    logs: List<Log>
+    state: LoggerState,
 ) = Column(modifier) {
-    if (logs.isEmpty()) return@Column
-    val start = logs.first().timeMs
-    val end = logs.last().timeMs
-    logs.groupBy(Log::tag).forEach { (tag, logsOfTag) ->
+    if (state.logs.isEmpty()) return@Column
+    val start = state.logs.first().value.timeMs
+    val end = state.logs.last().value.timeMs
+    state.logsMap.forEach { (tag, logsOfTag) ->
         Row(verticalAlignment = Alignment.CenterVertically) {
             if (logsOfTag.isEmpty()) return@Row
             Text("$tag: ")
@@ -105,7 +103,7 @@ fun TimeLine(
 @Composable
 fun TimeLine(
     modifier: Modifier = Modifier,
-    logs: List<Log>,
+    logs: List<State<Log>>,
     start: Long,
     end: Long,
     color: Color,
@@ -126,7 +124,8 @@ fun TimeLine(
     val axisFocus = size.height / 8
     val axisHover = size.height * 7 / 8
 
-    logs.forEach { log ->
+    logs.forEach { logState ->
+        val log by logState
         val x = (log.timeMs - start) * scale + dotRadius
         drawCircle(
             color = color,
@@ -156,19 +155,25 @@ fun rememberLoggerState() = remember {
 }
 
 class LoggerState {
-    private val _logs = mutableStateListOf<Log>()
-    val logs: List<Log> get() = _logs
+    private val _logs = mutableStateListOf<MutableState<Log>>()
+    val logs: List<State<Log>> get() = _logs
+    private val _logsMap = mutableStateMapOf<String, List<MutableState<Log>>>()
+    val logsMap: Map<String, List<State<Log>>> get() = _logsMap
 
     fun log(text: Any?, tag: String = "default") {
-        _logs += Log(tag, Clock.System.now(), text.toString())
+        val log = mutableStateOf(
+            Log(tag = tag, time = Clock.System.now(), text = text.toString())
+        )
+        _logs += log
+        _logsMap[tag] = _logsMap.getOrElse(tag, ::emptyList) + log
     }
 
     fun hover(log: Log) {
-        _logs[logIndex(log)] = log.copy(hovering = !log.hovering)
+        findLogState(log)?.value = log.copy(hovering = !log.hovering)
     }
 
     fun focus(log: Log) {
-        _logs[logIndex(log)] = log.copy(focusing = !log.focusing)
+        findLogState(log)?.value = log.copy(focusing = !log.focusing)
     }
 
     fun newLine() {
@@ -179,7 +184,7 @@ class LoggerState {
         _logs.clear()
     }
 
-    private fun logIndex(log: Log) = _logs.indexOfFirst { it.time == log.time }
+    private fun findLogState(log: Log) = _logs.find { it.value.time == log.time }
 }
 
 data class Log(
