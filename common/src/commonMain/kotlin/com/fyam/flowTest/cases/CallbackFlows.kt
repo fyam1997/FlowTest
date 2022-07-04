@@ -2,7 +2,7 @@ package com.fyam.flowTest.cases
 
 import androidx.compose.runtime.Composable
 import com.fyam.flowTest.components.JobButton
-import com.fyam.flowTest.components.LoggerState
+import com.fyam.flowTest.components.logger.LoggerState
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 
