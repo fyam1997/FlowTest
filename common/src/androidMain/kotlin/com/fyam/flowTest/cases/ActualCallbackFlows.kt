@@ -2,7 +2,7 @@ package com.fyam.flowTest.cases
 
 actual class OldAss {
     private val thread = Thread {
-        Thread.sleep(2000)
+        Thread.sleep(500)
         callback?.invoke("Hello")
     }
     private var callback: ((String) -> Unit)? = null
